@@ -8,9 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_SDK_ROOT: ${{ runner.tool_cache }}/android-sdk
+      ANDROID_HOME: ${{ runner.tool_cache }}/android-sdk
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -19,13 +22,12 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install Android SDK dependencies
+      - name: Accept Android SDK Licenses
         run: |
-          flutter config --no-analytics
-          flutter doctor
-          yes | flutter doctor --android-licenses
+          mkdir -p $ANDROID_SDK_ROOT/licenses
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
+          echo "84831b9409646a918e30573d2c476c284a093075" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
 
-      # 重点：cd 进入 app 子目录，这里才是flutter项目根
       - name: Fetch flutter dependencies
         working-directory: ./app
         run: flutter pub get
