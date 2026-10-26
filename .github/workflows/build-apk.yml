@@ -1,44 +1,30 @@
 name: Build Maidong KTV APK
-run-name: Build APK from source
 on:
-  workflow_dispatch:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ANDROID_SDK_ROOT: ${{ runner.tool_cache }}/android-sdk
-      ANDROID_HOME: ${{ runner.tool_cache }}/android-sdk
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
+      - name: Checkout source
+        uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
-          channel: 'stable'
-          cache: true
+          channel: stable
 
-      - name: Accept Android SDK Licenses
-        run: |
-          mkdir -p $ANDROID_SDK_ROOT/licenses
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $ANDROID_SDK_ROOT/licenses/android-sdk-license
-          echo "84831b9409646a918e30573d2c476c284a093075" > $ANDROID_SDK_ROOT/licenses/android-sdk-preview-license
-
-      - name: Fetch flutter dependencies
-        working-directory: ./app
+      - name: Get dependencies
         run: flutter pub get
 
-      - name: Build Android arm64 release APK (TV盒子)
-        working-directory: ./app
+      - name: Build Android TV APK
         run: flutter build apk --release --target-platform android-arm64
 
-      - name: Upload compiled APK as artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: maidong-ktv-arm64-apk
-          path: app/build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 30
+          name: maidong-ktv-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
