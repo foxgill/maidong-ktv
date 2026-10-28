@@ -17,16 +17,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # 改用稳定版本，不再自动拉取废弃的tools包
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: malf/setup-android@v3
 
-      - name: Accept Android SDK licenses
+      # 接受协议，不再额外安装tools
+      - name: Accept SDK licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Debug APK（自带debug签名，不需要额外keystore）
+      - name: Build Debug APK
         run: ./gradlew assembleDebug
 
       - name: Upload APK artifact
